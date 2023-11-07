@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lessons Page</title>
+    <script defer src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"
+            integrity="sha384-rOA1PnstxnOBLzCLMcre8ybwbTmemjzdNlILg8O7z1lUkLXozs4DHonlDtnE7fpc"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="lesson.js"></script>
+</head>
+<body>
+<div id="app">
+    <div class="container-fluid" v-if="isProductPage">
+        <div class="row" style="height: 100vh;">
+            <!--Sidebar-->
+            <nav class="col-2 d-none d-md-block bg-light sidebar">
+                <div class="mt-3">
+                    <h4>Sort by:</h4>
+                    <select class="form-control" v-model="sortBy">
+                        <option value="Subject">Subject</option>
+                        <option value="Location">Location</option>
+                        <option value="Price">Price</option>
+                        <option value="Spaces">Availability</option>
+                    </select>
+                    <br/>
+                    <div class="col">
+                        <h4>Order:</h4>
+                        <input id="rdoAscending" class="form-check-input" type="radio" v-model="sortOrder" value="1">
+                        <label for="rdoAscending" class="form-check-label"> Ascending </label>
+                        <br/>
+                        <input id="rdoDescending" class="form-check-input" type="radio" v-model="sortOrder" value="-1">
+                        <label for="rdoDescending" class="form-check-label">Descending</label>
+                    </div>
+                </div>
+            </nav>
+            <!--Product Page-->
+            <main class="col-10 pt-3 px-4">
+                <div class="row">
+                    <div class="col-6 mx-auto mt-2 mb-2 text-center search-bar">
+                        <input type="text" class="form-control" placeholder="Search lessons" v-model="searchQuery">
+                    </div>
+                    <div class="col-6 text-right">
+                        <button class="btn" :style="{'cursor': cart?.length <= 0 ? 'not-allowed' : 'pointer'}"
+                                :class="cart?.length > 0 ? 'btn-success' : 'btn-secondary'"
+                                :disabled="cart?.length <= 0"
+                                @click="toCartPage">
+                            ( {{cartItemCount}} )<i class="fas fa-shopping-cart"></i> Shopping Cart
+                        </button>
+                    </div>
+                </div>
+                <h1>{{title}}</h1>
+                <p>{{descriptions}}</p>
+                <div class="row">
+                    <!--Lesson cards-->
+                    <div class="col-md-4" v-for="lesson in displayedLessons">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="card-title">Subject: {{ lesson.Subject }}</h5>
+                                        <p class="card-text">Location: {{ lesson.Location }}</p>
+                                        <p class="card-text">Price: £{{ lesson.Price }}</p>
+                                        <p class="card-text">Spaces: {{ lesson.Spaces }}</p>
+                                    </div>
+                                    <div class="text-center">
+                                        <i class="fas" :class="lesson.Icon" style="font-size: 2rem;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" :class="lesson.Spaces <= 0 && 'disabled btn-secondary'"
+                                    @click="addToCart(lesson)" :disabled="lesson.Spaces <= 0"
+                                    :style="{'cursor': lesson.Spaces <= 0 ? 'not-allowed' : 'pointer'}">Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <div v-else>
+        <!--Order Submitted Modal-->
+        <div id="orderSubmittedModal" class="modal fade" tabindex="-1" role="dialog"
+             aria-labelledby="modalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Order Submitted</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>Your order has been submitted successfully!</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button @click="backToHome(true)" type="button" class="btn btn-primary" data-dismiss="modal">
+                            Back to home
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Checkout Page-->
+        <div class="container-fluid">
+            <div class="row mt-3">
+                <div class="col-12 text-right">
+                    <button class="btn btn-primary" @click="backToHome">
+                        <i class="fas fa-home"></i>
+                        Back to Home
+                    </button>
+                </div>
+            </div>
+            <section class="h-100 h-custom">
+                <div class="container py-1 h-100">
+                    <div class="row d-flex justify-content-center align-items-center h-100">
+                        <div class="col-12">
+                            <div class="card card-registration card-registration-2 rounded-corner">
+                                <div class="card-body p-0">
+                                    <div class="row g-0">
+                                        <div class="col-lg-8">
+                                            <div class="p-5">
+                                                <div class="d-flex justify-content-between align-items-center mb-5">
+                                                    <div v-if="cartItemCount <= 0">
+                                                        <h1 class="fw-bold mb-0 text-black">Your Shopping Cart is
+                                                            empty!</h1>
+                                                    </div>
+                                                    <div v-else>
+                                                        <h1 class="fw-bold mb-0 text-black">Shopping Cart</h1>
+                                                        <h6 class="mb-0 text-muted">{{cartItemCount}}
+                                                            lesson{{cartItemCount > 1 ? "s" : ""}}</h6>
+                                                    </div>
+                                                </div>
+                                                <hr class="my-4">
+                                                <div v-for="item in cart">
+                                                    <div class="row mb-4 d-flex justify-content-between align-items-center">
+                                                        <div class="col-1">
+                                                            <i class="fas" :class="item.lesson.Icon"
+                                                               style="font-size: 2rem;"></i>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <h6 class="text-muted">{{item.lesson.Subject}}</h6>
+                                                            <h6 class="text-black mb-0">{{item.lesson.Location}}</h6>
+                                                        </div>
+                                                        <div class="col-3 d-flex">
+                                                            <button class="btn btn-link px-2"
+                                                                    @click="reduceFromCart(item.lesson)">
+                                                                <i class="fas fa-minus"></i>
+                                                            </button>
+
+                                                            <input id="form1" min="1" name="quantity" :value=item.amount
+                                                                   type="number" onKeyDown="return false"
+                                                                   class="form-control form-control-sm"/>
+
+                                                            <button class="btn btn-link px-2"
+                                                                    @click="addToCart(item.lesson)">
+                                                                <i class="fas fa-plus"></i>
+                                                            </button>
+                                                        </div>
+                                                        <div class="col-2 offset-lg-1">
+                                                            <h6 class="mb-0">£{{item.lesson.Price * item.amount}}</h6>
+                                                        </div>
+                                                        <div class="col-1 text-end">
+                                                            <a @click="removeFromCart(item)" class="text-muted"><i
+                                                                    class="fas fa-trash" style="color: #E20100"></i></a>
+                                                        </div>
+                                                    </div>
+                                                    <hr class="my-4">
+                                                </div>
+                                                <div class="pt-5">
+                                                    <h6 class="mb-0"><a @click="backToHome" class="text-body"><i
+                                                            class="fas fa-long-arrow-alt-left me-2"></i>Back to Home</a>
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 bg-grey">
+                                            <div class="p-5">
+                                                <h3 class="fw-bold mb-5 mt-2 pt-1">Checkout</h3>
+                                                <hr class="my-4">
+                                                <h5 class="text-uppercase mb-3">Personal Info</h5>
+                                                <div class="mb-4 pb-2">
+                                                    <div class="form-group">
+                                                        <label for="name">Name:</label>
+                                                        <input type="text"
+                                                               :class="isNameValid ? 'form-control' : 'form-control is-invalid'"
+                                                               id="name" v-model="name" @input="validateName">
+                                                        <div id="validateName" class="invalid-feedback"
+                                                             v-if="name && !isNameValid">
+                                                            Please provide a valid name. (Only letters and spaces)
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-5">
+                                                    <div class="form-group">
+                                                        <label for="phone">Phone number:</label>
+                                                        <input type="text" class="form-control"
+                                                               :class="isNumberValid ? 'form-control' : 'form-control is-invalid'"
+                                                               id="phone"
+                                                               v-model="phoneNumber"
+                                                               @input="validateNumber">
+                                                        <div id="validatePhone" class="invalid-feedback"
+                                                             v-if="phoneNumber && !isNumberValid">
+                                                            Please provide a valid phone number. (Only digits)
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <hr class="my-4">
+
+                                                <div class="d-flex justify-content-between mb-5">
+                                                    <h5 class="text-uppercase">Total price:</h5>
+                                                    <h5>£{{totalPrice}}</h5>
+                                                </div>
+
+                                                <button type="button" class="btn btn-dark btn-block btn-lg"
+                                                        data-mdb-ripple-color="dark" :disabled="!isFormValid"
+                                                        data-toggle="modal"
+                                                        data-target="#orderSubmittedModal">Checkout
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+<script src="main.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+</body>
+</html>
