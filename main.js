@@ -3,7 +3,7 @@ new Vue({
     data: {
         title: "Lessons",
         descriptions: "You can choose the lessons here:",
-        lessons: LESSONS,
+        lessons: [],
         cart: [],
         isProductPage: true,
         searchQuery: "",
@@ -14,7 +14,17 @@ new Vue({
         isNameValid: true,
         isNumberValid: true,
     },
+    beforeMount() {
+        this.fetchLessons();
+    },
     methods: {
+        fetchLessons: async function () {
+            const response = await fetch("http://localhost:3000/api/lessons");
+            this.lessons = await response.json();
+        },
+        fetchImages: async function () {
+            const response = await fetch("http://localhost:3000/api/images");
+        },
         addToCart: function (lesson) {
             if (lesson.Spaces > 0) {
                 lesson.Spaces--;
@@ -49,25 +59,69 @@ new Vue({
         toCartPage: function () {
             this.isProductPage = false;
         },
-        backToHome: function (modalClose) {
-            // reset everything when user goes back home
-            this.isProductPage = true;
-            this.isNameValid = true;
-            this.isNumberValid = true;
-            this.name = "";
-            this.phoneNumber = "";
-            if(modalClose === true){
-                this.clearCheckoutForm();
-            }
+        submitOrder: async function () {
+            const finalCart = this.cart.map(item => ({
+                "_id": item.lesson._id,
+                "Subject": item.lesson.Subject,
+                "amount": item.amount
+            }));
+            const updatedLessons = this.cart.map(item => ({
+                "_id": item.lesson._id,
+                "Spaces": item.lesson.Spaces
+            }));
+            const order = {
+                name: this.name,
+                phoneNumber: this.phoneNumber,
+                cart: finalCart
+            };
+            fetch("http://localhost:3000/api/order", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(order)
+            }).then(async (res) => {
+                    const result = await res.json();
+
+                    if (result.acknowledged) {
+                        updatedLessons.map(async (lesson) => {
+                            await fetch(`http://localhost:3000/api/lessons/${lesson._id}`, {
+                                method: "PUT",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(lesson)
+                            });
+                        })
+                    }
+                }
+            );
         },
+        backToHome:
+
+            function (modalClose) {
+                // reset everything when user goes back home
+                this.isProductPage = true;
+                this.isNameValid = true;
+                this.isNumberValid = true;
+                this.name = "";
+                this.phoneNumber = "";
+                if (modalClose === true) {
+                    this.clearCheckoutForm();
+                }
+            }
+
+        ,
         validateName: function () {
             const nameRegex = /^[A-Za-z\s]+$/; // only letters and spaces
             this.isNameValid = nameRegex.test(this.name)
-        },
+        }
+        ,
         validateNumber: function () {
             let phoneRegex = /^[0-9]+$/; // only numbers
             this.isNumberValid = phoneRegex.test(this.phoneNumber);
-        },
+        }
+        ,
         clearCheckoutForm: function () {
             this.cart = [];
             this.name = "";

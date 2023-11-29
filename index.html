@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-    <script src="lesson.js"></script>
+    <!-- <script src="lesson.js"></script> -->
 </head>
 <body>
 <div id="app">
@@ -215,7 +215,7 @@
 
                                                 <button type="button" class="btn btn-dark btn-block btn-lg"
                                                         data-mdb-ripple-color="dark" :disabled="!isFormValid"
-                                                        data-toggle="modal"
+                                                        data-toggle="modal" @click="submitOrder"
                                                         data-target="#orderSubmittedModal">Checkout
                                                 </button>
                                             </div>
