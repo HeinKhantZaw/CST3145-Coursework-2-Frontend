@@ -2,7 +2,7 @@ const app = new Vue({
     el: "#app", data: {
         title: "Lessons",
         descriptions: "You can choose the lessons here:",
-        baseURL: "http://localhost:3000/api/",
+        baseURL: "http://vue-env.eba-knuwpbba.eu-west-2.elasticbeanstalk.com/api/",
         lessons: [],
         images: [],
         cart: [],
