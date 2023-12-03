@@ -29,10 +29,10 @@
                     <br/>
                     <div class="col">
                         <h4>Order:</h4>
-                        <input id="rdoAscending" class="form-check-input" type="radio" v-model="sortOrder" value="1">
+                        <input id="rdoAscending" class="form-check-input" type="radio" v-model="sortOrder" value="asc">
                         <label for="rdoAscending" class="form-check-label"> Ascending </label>
                         <br/>
-                        <input id="rdoDescending" class="form-check-input" type="radio" v-model="sortOrder" value="-1">
+                        <input id="rdoDescending" class="form-check-input" type="radio" v-model="sortOrder" value="dsc">
                         <label for="rdoDescending" class="form-check-label">Descending</label>
                     </div>
                 </div>
@@ -56,8 +56,9 @@
                 <p>{{descriptions}}</p>
                 <div class="row">
                     <!--Lesson cards-->
-                    <div class="col-md-4" v-for="lesson in displayedLessons">
+                    <div class="col-md-4" v-for="lesson in lessons">
                         <div class="card mb-4">
+                            <img class="card-img-top" :src="images.find(image=>image.Subject===lesson.Subject).URL" :alt="lesson.Subject">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
@@ -65,9 +66,6 @@
                                         <p class="card-text">Location: {{ lesson.Location }}</p>
                                         <p class="card-text">Price: £{{ lesson.Price }}</p>
                                         <p class="card-text">Spaces: {{ lesson.Spaces }}</p>
-                                    </div>
-                                    <div class="text-center">
-                                        <i class="fas" :class="lesson.Icon" style="font-size: 2rem;"></i>
                                     </div>
                                 </div>
                             </div>
@@ -135,10 +133,6 @@
                                                 <hr class="my-4">
                                                 <div v-for="item in cart">
                                                     <div class="row mb-4 d-flex justify-content-between align-items-center">
-                                                        <div class="col-1">
-                                                            <i class="fas" :class="item.lesson.Icon"
-                                                               style="font-size: 2rem;"></i>
-                                                        </div>
                                                         <div class="col-4">
                                                             <h6 class="text-muted">{{item.lesson.Subject}}</h6>
                                                             <h6 class="text-black mb-0">{{item.lesson.Location}}</h6>
@@ -148,11 +142,9 @@
                                                                     @click="reduceFromCart(item.lesson)">
                                                                 <i class="fas fa-minus"></i>
                                                             </button>
-
                                                             <input id="form1" min="1" name="quantity" :value=item.amount
                                                                    type="number" onKeyDown="return false"
                                                                    class="form-control form-control-sm"/>
-
                                                             <button class="btn btn-link px-2"
                                                                     @click="addToCart(item.lesson)">
                                                                 <i class="fas fa-plus"></i>
