@@ -2,7 +2,7 @@ const app = new Vue({
     el: "#app", data: {
         title: "Lessons",
         descriptions: "You can choose the lessons here:",
-        baseURL: "https://vue-env.eba-knuwpbba.eu-west-2.elasticbeanstalk.com/api/",
+        baseURL: "https://vue-env.eba-knuwpbba.eu-west-2.elasticbeanstalk.com/",
         lessons: [],
         images: [],
         cart: [],
@@ -32,7 +32,7 @@ const app = new Vue({
     },
     methods: {
         fetchLessons: async function () {
-            const response = await fetch(this.baseURL + "lessons");
+            const response = await fetch(this.baseURL + "api/lessons");
             this.lessons = await response.json();
             this.lessons.map(async (lesson) => {
                 this.images.push({
@@ -42,7 +42,7 @@ const app = new Vue({
             });
         },
         fetchAndFilterLessons: async function () {
-          const response = await fetch(`${this.baseURL}lessons/filter?search=${this.searchQuery}&sortBy=${this.sortBy}&sortOrder=${this.sortOrder}`);
+          const response = await fetch(`${this.baseURL}api/lessons/filter?search=${this.searchQuery}&sortBy=${this.sortBy}&sortOrder=${this.sortOrder}`);
           this.lessons = await response.json();
         },
         addToCart: function (lesson) {
@@ -88,7 +88,7 @@ const app = new Vue({
             const order = {
                 name: this.name, phoneNumber: this.phoneNumber, cart: finalCart
             };
-            fetch(this.baseURL + "order", {
+            fetch(this.baseURL + "api/order", {
                 method: "POST", headers: {
                     "Content-Type": "application/json"
                 },
