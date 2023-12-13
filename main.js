@@ -3,6 +3,7 @@ const app = new Vue({
         title: "Lessons",
         descriptions: "You can choose the lessons here:",
         baseURL: "https://vue-env.eba-knuwpbba.eu-west-2.elasticbeanstalk.com/api/",
+        staticURL: "https://vue-env.eba-knuwpbba.eu-west-2.elasticbeanstalk.com/",
         lessons: [],
         images: [],
         cart: [],
@@ -37,7 +38,7 @@ const app = new Vue({
             this.lessons.map(async (lesson) => {
                 this.images.push({
                     Subject: lesson.Subject,
-                    URL: this.baseURL + "images/" + lesson.Subject.toLowerCase() + ".jpg"
+                    URL: this.staticURL + "images/" + lesson.Subject.toLowerCase() + ".jpg"
                 });
             });
         },
