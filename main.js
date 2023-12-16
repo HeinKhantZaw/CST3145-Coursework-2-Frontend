@@ -1,7 +1,8 @@
-const app = new Vue({
+new Vue({
     el: "#app", data: {
         title: "Lessons",
         descriptions: "You can choose the lessons here:",
+        // http://localhost:3000/api/
         baseURL: "https://vue-env.eba-knuwpbba.eu-west-2.elasticbeanstalk.com/api/",
         staticURL: "https://vue-env.eba-knuwpbba.eu-west-2.elasticbeanstalk.com/",
         lessons: [],
@@ -43,7 +44,7 @@ const app = new Vue({
             });
         },
         fetchAndFilterLessons: async function () {
-          const response = await fetch(`${this.baseURL}lessons/filter?search=${this.searchQuery}&sortBy=${this.sortBy}&sortOrder=${this.sortOrder}`);
+          const response = await fetch(`${this.baseURL}search?query=${this.searchQuery}&sortBy=${this.sortBy}&sortOrder=${this.sortOrder}`);
           this.lessons = await response.json();
         },
         addToCart: function (lesson) {
@@ -148,7 +149,3 @@ const app = new Vue({
         }
     }
 });
-
-// fetch(this.baseURL + "lessons/filter?search=" + this.searchQuery + "&sortBy=" + this.sortBy + "&sortOrder=" + this.sortOrder).then(async (res) => {
-//     this.lessons = await res.json();
-// });
