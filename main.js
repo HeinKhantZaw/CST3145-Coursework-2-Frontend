@@ -99,7 +99,7 @@ new Vue({
                 const result = await res.json();
                 if (result.acknowledged) {
                     updatedLessons.map(async (lesson) => {
-                        await fetch(`http://localhost:3000/api/lessons/${lesson._id}`, {
+                        await fetch(`${this.baseURL}lessons/${lesson._id}`, {
                             method: "PUT", headers: {
                                 "Content-Type": "application/json"
                             },
